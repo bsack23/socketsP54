@@ -80,8 +80,9 @@ const sketch = (p) => {
       // p.print(positions);
       for (const pos of positions) {
         //p.print(pos.x, pos.y);
+        p.noStroke();
         p.fill('yellow'); // whatever
-        p.rect(pos.x * (p.width / 9), pos.y * (p.height / 9), 20);
+        p.rect(pos.x * (p.width / 9), pos.y * (p.height / 9), 36);
       }
     }
     let xloc = (p.width / 9) * gx;

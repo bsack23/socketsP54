@@ -30,12 +30,17 @@ http.listen(port, () => {
 const positions = {};
 // make an array for all of the stored positions
 const storedPositions = {};
+const playerIDs = [];
 let num = 0;
 //Socket configuration
 io.on('connection', (socket) => {
   //each time someone visits the site and connects to socket.io this function  gets called
   //it includes the socket object from which you can get the id, useful for identifying each client
   console.log(`${socket.id} connected`);
+  io.to(socket.id).emit('yourID', socket.id);
+  playerIDs.push(socket.id);
+  io.to(playerIDs[0]).emit('yourTurn', 1);
+  console.log(`${playerIDs[0]} turn`);
   // add a starting position when the client connects
   // for this, everyone starts at grid 1, 1
   positions[socket.id] = { x: 1, y: 1, n: num };
@@ -49,6 +54,7 @@ io.on('connection', (socket) => {
     //when this client disconnects, delete its position from the object.
     delete positions[socket.id];
     delete storedPositions[socket.id];
+    playerIDs.splice(playerIDs.indexOf(socket.id), 1);
     console.log(`${socket.id} disconnected`);
   });
 
@@ -66,6 +72,13 @@ io.on('connection', (socket) => {
     io.emit('storedPositions', storedPositions);
     // io.emit('storedPositions', 'hello');
     console.log('here are the arrays');
+    // this would be where the playerIDs array would be rotated
+    // and message sent to player with next turn
+    const toLast = playerIDs.shift();
+    playerIDs.push(toLast);
+    io.emit('yourTurn', 0);
+    io.to(playerIDs[0]).emit('yourTurn', 1);
+    console.log(`${playerIDs[0]}\'s turn`);
   });
 });
 

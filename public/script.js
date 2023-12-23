@@ -15,6 +15,8 @@ const socket = io({
 const sketch = (p) => {
   let positions = {};
   let storedPositions = [];
+  let yourTurn = 0;
+  let myID = '';
   //the p5js setup function
   p.setup = () => {
     //to fill up the full container, get the width an height
@@ -41,6 +43,14 @@ const sketch = (p) => {
     // socket.off('storedPositions', () => {
     //   console.log('SPclosed');
     // });
+    socket.on('yourID', (data) => {
+      myID = data;
+      console.log('i am ' + myID);
+    });
+    socket.on('yourTurn', (data) => {
+      yourTurn = data;
+      console.log('its your turn ' + yourTurn);
+    });
   };
   let gx = 1,
     gy = 1;
@@ -61,9 +71,14 @@ const sketch = (p) => {
     // draw the current positions of other players
     for (const id in positions) {
       const position = positions[id];
-      p.fill(255); //sets the fill color of the circle to white
+      if (id == myID) {
+        p.fill('red');
+      } else {
+        p.fill('white'); // whatever
+      }
+      // p.fill(255); //sets the fill color of the circle to white
       // draw white dots wherever other players' positions are
-      p.ellipse(position.x * (p.width / 9), position.y * (p.height / 9), 20);
+      p.ellipse(position.x * (p.width / 9), position.y * (p.height / 9), 30);
       // try to print an id number on each dot - i'm not sure this works
       p.fill(0); //sets the fill color of the text to black
       p.text(
@@ -75,22 +90,33 @@ const sketch = (p) => {
 
     // draw the stored positions?
     for (const id in storedPositions) {
-      // p.print(id);
+      // p.print(id, myID);
+      if (id == myID) {
+        p.fill('blue');
+      } else {
+        p.fill('yellow'); // whatever
+      }
       const positions = storedPositions[id];
       // p.print(positions);
       for (const pos of positions) {
         //p.print(pos.x, pos.y);
         p.noStroke();
-        p.fill('yellow'); // whatever
         p.rect(pos.x * (p.width / 9), pos.y * (p.height / 9), 36);
       }
     }
     let xloc = (p.width / 9) * gx;
     let yloc = (p.height / 9) * gy;
     // the marker the user of the client will see is always red
-    p.fill('red');
-    p.ellipse(xloc, yloc, 30);
+    // p.fill('red');
+    // p.ellipse(xloc, yloc, 30);
+
+    if (yourTurn == 1) {
+      p.fill(255);
+      p.textSize(40);
+      p.text('YOUR TURN', 200, 20);
+    }
   };
+
   // user changes positions on grid with arrow keys
   p.keyPressed = () => {
     switch (p.key) {
@@ -107,10 +133,12 @@ const sketch = (p) => {
         gx += 1;
         break;
       case '/':
-        socket.emit('storePosition', {
-          x: gx,
-          y: gy,
-        });
+        if (yourTurn == 1) {
+          socket.emit('storePosition', {
+            x: gx,
+            y: gy,
+          });
+        }
     }
     // boundaries for our little ball on the grid
     if (gy < 1) gy = 1;

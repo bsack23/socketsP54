@@ -5,9 +5,6 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http, {
   transports: ['websocket'], //set to use websocket only
 }); //this loads socket.io and connects it to the server.
-// const io = require('socket.io')();
-// io.on('connection', client => { ... });
-//io.listen(3000);
 
 const port = process.env.PORT || 8080;
 // const port = process.env.PORT || 80;
@@ -37,8 +34,11 @@ io.on('connection', (socket) => {
   //each time someone visits the site and connects to socket.io this function  gets called
   //it includes the socket object from which you can get the id, useful for identifying each client
   console.log(`${socket.id} connected`);
+  // tell the client its ID
   io.to(socket.id).emit('yourID', socket.id);
+  // add the ID to the playerIDs array
   playerIDs.push(socket.id);
+  // send message to first player in array that it's their turn
   io.to(playerIDs[0]).emit('yourTurn', 1);
   console.log(`${playerIDs[0]} turn`);
   // add a starting position when the client connects
@@ -64,19 +64,20 @@ io.on('connection', (socket) => {
     positions[socket.id].y = data.y;
     positions[socket.id].n = data.n;
     io.emit('positions', positions);
-    // console.log('here' + positions);
   });
+  // when a new storedPosition message arrives
   socket.on('storePosition', (data) => {
+    // push the location onto the appropriate array
     storedPositions[socket.id].push({ x: data.x, y: data.y, n: data.n });
     console.log(storedPositions);
+    // broadcast the new storedPositions
     io.emit('storedPositions', storedPositions);
-    // io.emit('storedPositions', 'hello');
-    console.log('here are the arrays');
-    // this would be where the playerIDs array would be rotated
-    // and message sent to player with next turn
+    // rotate the playerIDs array
     const toLast = playerIDs.shift();
     playerIDs.push(toLast);
+    // broadcast reset all yourTurns to 0
     io.emit('yourTurn', 0);
+    // send yourTurn = 1 message to first player in array
     io.to(playerIDs[0]).emit('yourTurn', 1);
     console.log(`${playerIDs[0]}\'s turn`);
   });
@@ -85,8 +86,8 @@ io.on('connection', (socket) => {
 //send positions every framerate to each client
 // may not need this for our application -
 // consider doing an 'emit' only when there's a change?
-const frameRate = 30;
-setInterval(() => {
-  // io.emit('positions', positions);
-  // io.emit('storedPositions', storedPositions);
-}, 1000 / frameRate);
+// const frameRate = 30;
+// setInterval(() => {
+// io.emit('positions', positions);
+// io.emit('storedPositions', storedPositions);
+// }, 1000 / frameRate);

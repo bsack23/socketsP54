@@ -69,15 +69,17 @@ const sketch = (p) => {
       }
     }
     // draw the current positions of other players
+    // NOTE - maybe move this to after stored positions are drawn
     for (const id in positions) {
       const position = positions[id];
       if (id == myID) {
+        // draw red where we are
         p.fill('red');
       } else {
+        // draw white dots wherever other players' positions are
         p.fill('white'); // whatever
       }
-      // p.fill(255); //sets the fill color of the circle to white
-      // draw white dots wherever other players' positions are
+
       p.ellipse(position.x * (p.width / 9), position.y * (p.height / 9), 30);
       // try to print an id number on each dot - i'm not sure this works
       p.fill(0); //sets the fill color of the text to black
@@ -115,7 +117,7 @@ const sketch = (p) => {
       p.textSize(40);
       p.text('YOUR TURN', 200, 20);
     }
-  };
+  }; // closes p.draw()
 
   // user changes positions on grid with arrow keys
   p.keyPressed = () => {

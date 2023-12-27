@@ -68,8 +68,31 @@ const sketch = (p) => {
         p.ellipse(xloc, yloc, 35);
       }
     }
+
+    // draw the stored positions?
+    for (const id in storedPositions) {
+      // p.print(id, myID);
+      if (id == myID) {
+        p.fill('blue');
+      } else {
+        p.fill('yellow'); // whatever
+      }
+      const positions = storedPositions[id];
+      // p.print(positions);
+      for (const pos of positions) {
+        //p.print(pos.x, pos.y);
+        p.noStroke();
+        p.rect(pos.x * (p.width / 9), pos.y * (p.height / 9), 36);
+      }
+    }
+    // let xloc = (p.width / 9) * gx;
+    // let yloc = (p.height / 9) * gy;
+    // the marker the user of the client will see is always red
+    // p.fill('red');
+    // p.ellipse(xloc, yloc, 30);
+
     // draw the current positions of other players
-    // NOTE - maybe move this to after stored positions are drawn
+    // moved this to after stored positions are drawn
     for (const id in positions) {
       const position = positions[id];
       if (id == myID) {
@@ -89,28 +112,6 @@ const sketch = (p) => {
         position.y * (p.height / 9)
       );
     }
-
-    // draw the stored positions?
-    for (const id in storedPositions) {
-      // p.print(id, myID);
-      if (id == myID) {
-        p.fill('blue');
-      } else {
-        p.fill('yellow'); // whatever
-      }
-      const positions = storedPositions[id];
-      // p.print(positions);
-      for (const pos of positions) {
-        //p.print(pos.x, pos.y);
-        p.noStroke();
-        p.rect(pos.x * (p.width / 9), pos.y * (p.height / 9), 36);
-      }
-    }
-    let xloc = (p.width / 9) * gx;
-    let yloc = (p.height / 9) * gy;
-    // the marker the user of the client will see is always red
-    // p.fill('red');
-    // p.ellipse(xloc, yloc, 30);
 
     if (yourTurn == 1) {
       p.fill(255);

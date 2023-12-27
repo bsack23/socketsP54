@@ -72,6 +72,37 @@ io.on('connection', (socket) => {
     console.log(storedPositions);
     // broadcast the new storedPositions
     io.emit('storedPositions', storedPositions);
+
+    // hillbilly attempt to check for four in a row
+    // up & down or across - hej, it works!
+    // but only for certain cases
+    for (let sp of Object.entries(storedPositions)) {
+      // console.log(storedPositions.indexOf(sp));
+      console.log(sp);
+      let winner = sp[0];
+      let yDiffs = 0,
+        xSums = 0,
+        xDiffs = 0,
+        ySums = 0;
+      for (let i = 0; i < sp[1].length; ++i) {
+        xSums += sp[1][i].x;
+        yDiffs += sp[1][i].y - i;
+        ySums += sp[1][i].y;
+        xDiffs += sp[1][i].x - i;
+      }
+
+      // console.log(ySums, xDiffs);
+      // console.log(xSums, yDiffs);
+
+      if (
+        (xSums % 4 == 0 && yDiffs % 4 == 0) ||
+        (ySums % 4 == 0 && xDiffs % 4 == 0)
+      ) {
+        // notify winner in some way
+        console.log('ding ding - we have a winner: ' + winner);
+      }
+    }
+
     // rotate the playerIDs array
     const toLast = playerIDs.shift();
     playerIDs.push(toLast);

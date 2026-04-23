@@ -9,7 +9,7 @@ players now take turns - the words 'YOUR TURN' appear when it's your turn!
 in app:
 
 - check stored positions for four in a row
-- increase score for getting four in a row
+- increase score more for getting four in a row
 
 ### HOW TO TRY THIS OUT
 
